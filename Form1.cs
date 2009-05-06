@@ -12,13 +12,15 @@ namespace webstat
 	{
 		List<IService> services = new List<IService>();
 
+        private IService selectedWebViewService;
+
 		public Form1()
 		{
 			InitializeComponent();
 
 			services.Add(new PingService("Localhost", "127.0.0.1"));
 			//services.Add(new PingService("Server", "192.168.0.102"));
-			services.Add(new PingService("Google", "66.249.91.103"));
+            services.Add(new PingService("Google", "216.239.59.104"));
 			services.Add(new PingService("Blixtvik29", "87.96.213.29"));
 			services.Add(new PingService("Blixtvik30", "87.96.213.30"));
 
@@ -50,9 +52,11 @@ namespace webstat
 
 			foreach (IService service in services)
 			{
-				panel1.Controls.Add(new WebView(service));
+                WebView webView = new WebView(service);
+				panel1.Controls.Add(webView);
 				service.Start();
 				service.LogEvent += new LogEvent(service_LogEvent);
+                webView.Click += new EventHandler(webView_Click);
 			}
 
 			serviceTick.Start();
@@ -60,9 +64,33 @@ namespace webstat
 			stopToolStripMenuItem.Enabled = true;
 		}
 
+        void webView_Click(object sender, EventArgs e)
+        {
+            SwitchSelectedWebView(sender);
+        }
+
+        private void SwitchSelectedWebView(object sender)
+        {
+            selectedWebViewService = ((WebView)sender).Service;
+            UpdateSelectedWebView();
+        }
+
+        private void UpdateSelectedWebView()
+        {
+            if (selectedWebViewService != null)
+            {
+                listBox1.Items.Clear();
+                listBox1.Items.Add(selectedWebViewService.Name);
+                foreach (IServiceTickEvent tickEvent in selectedWebViewService.TickEvents)
+                {
+                    listBox1.Items.Insert(1, tickEvent.Timestamp.ToString() + " " + tickEvent.Status.ToString());
+                }
+            }
+        }
+
 		void service_LogEvent(string log_message, System.Diagnostics.EventLogEntryType type)
 		{
-			eventLogger.WriteEntry(log_message, type);
+			//eventLogger.WriteEntry(log_message, type);
 		}
 
 		private void StopServices()
@@ -86,6 +114,7 @@ namespace webstat
 			{
 				service.Tick();
 			}
+            UpdateSelectedWebView();
 		}
 
 

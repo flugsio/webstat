@@ -12,6 +12,8 @@ namespace webstat
 	{
 		private IService service;
 
+        public IService Service { get { return service; } }
+
 		public WebView()
 		{
 			InitializeComponent();

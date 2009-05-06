@@ -8,6 +8,10 @@ namespace webstat
 {
 	public class PingService : IService
 	{
+        private List<IServiceTickEvent> _TickEvents = new List<IServiceTickEvent>();
+
+        public List<IServiceTickEvent> TickEvents { get { return _TickEvents; } }
+
 		private int total_count = 0;
 		private int total_success = 0;
 
@@ -99,6 +103,7 @@ namespace webstat
 		public void Tick()
 		{
 			DoPing();
+            _TickEvents.Add(new TickEvent(DateTime.Now, this.Status));
 		}
 
 		private void DoPing()

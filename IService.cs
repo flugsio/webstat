@@ -15,6 +15,8 @@ namespace webstat
 		int Percent { get; }
 
 		Status Status {	get; set; }
+
+        List<IServiceTickEvent> TickEvents { get; }
 		
 		event EventHandler StatusChanged;
 
